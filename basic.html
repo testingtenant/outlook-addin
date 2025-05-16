@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>External Email Warning</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script>
+    Office.onReady(function(info) {
+      if (info.host === Office.HostType.Outlook) {
+        document.getElementById("sendButton").onclick = function() {
+          checkRecipients();
+        };
+      }
+    });
+
+    function checkRecipients() {
+      var item = Office.context.mailbox.item;
+      var recipients = item.to;
+      var externalRecipients = recipients.filter(function(recipient) {
+        return !recipient.emailAddress.endsWith("@4h72mt.onmicrosoft.com");
+      });
+
+      if (externalRecipients.length > 0) {
+        var confirmation = confirm("You are sending this email to an external recipient. Do you want to proceed?");
+        if (confirmation) {
+          item.send();
+        }
+      } else {
+        item.send();
+      }
+    }
+  </script>
+</head>
+<body>
+  <button id="sendButton">Send Email</button>
+</body>
+</html>
