@@ -8,11 +8,11 @@
 
   <Id>f3b6f9c0-1234-4b56-9abc-123456789abc</Id>
   <Version>1.0.0.0</Version>
- Tenant</ProviderName>
+  <ProviderName>Tenant</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="External Email Warning Add-in" />
   <Description DefaultValue="Warns before sending emails to external recipients." />
-  <IconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/icon.png" />
+  <IconUrl DefaultValue="https://raw.githubusercontent.com/testingtenant/outlook-addin/main/icon.png" />
   <SupportUrl DefaultValue="https://testingtenant.github.io/outlook-addin/" />
 
   <AppDomains>
