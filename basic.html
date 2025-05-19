@@ -1,16 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>External Email Warning</title>
-    <link rel="stylesheet" href="basic.css" />
-    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    <script src="basic.js" defer></script>
+  <title>External Email Warning</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 </head>
 <body>
-    <h2>External Email Warning Add-in</h2>
-    <div id="message">No external recipients detected.</div>
+  <h3>External Email Warning</h3>
+  <button id="checkButton">Check Recipients</button>
+
+  <script>
+    Office.onReady(function(info) {
+      if (info.host === Office.HostType.Outlook) {
+        document.getElementById("checkButton").onclick = checkRecipients;
+      }
+    });
+
+    function checkRecipients() {
+      const item = Office.context.mailbox.item;
+      item.to.getAsync(function(result) {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          const recipients = result.value;
+          const externalRecipients = recipients.filter(recipient =>
+            !recipient.emailAddress.endsWith("@4h72mt.onmicrosoft.com")
+          );
+
+          if (externalRecipients.length > 0) {
+            Office.context.mailbox.item.notificationMessages.replaceAsync("externalWarning", {
+              type: "informationalMessage",
+              message: "Warning: This email is being sent to external recipients.",
+              icon: "icon16",
+              persistent: true
+            });
+          } else {
+            Office.context.mailbox.item.notificationMessages.replaceAsync("externalWarning", {
+              type: "informationalMessage",
+              message: "All recipients are internal.",
+              icon: "icon16",
+              persistent: true
+            });
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>
