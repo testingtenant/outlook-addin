@@ -1,9 +1,13 @@
-Office.onReady(function () {
-    if (!Office.context.mailbox) {
+Office.onReady((info) => {
+    // Check if the add-in is running in Outlook
+    if (info.host !== Office.HostType.Outlook) {
         console.error("This add-in only works in Outlook.");
         return;
     }
 
+    console.log("Office is ready in Outlook.");
+    
+    // Register the event handler for ItemSend
     Office.context.mailbox.item.addHandlerAsync(Office.EventType.ItemSend, checkRecipients);
 });
 
@@ -11,20 +15,17 @@ function checkRecipients(eventArgs) {
     const organizationDomain = "4h72mt.onmicrosoft.com";  
     let warn = false;
 
-    // Check the 'to' recipients
     Office.context.mailbox.item.to.getAsync((asyncResult) => {
         if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
             const recipients = asyncResult.value;
-            if (recipients.length > 0) {
-                recipients.forEach((email) => {
-                    if (email.emailAddress.indexOf("@") > 0) {
-                        let domain = email.emailAddress.split('@')[1].toLowerCase();
-                        if (domain !== organizationDomain) {
-                            warn = true;
-                        }
+            recipients.forEach((email) => {
+                if (email.emailAddress.indexOf("@") > 0) {
+                    let domain = email.emailAddress.split('@')[1].toLowerCase();
+                    if (domain !== organizationDomain) {
+                        warn = true;
                     }
-                });
-            }
+                }
+            });
 
             if (warn) {
                 showPopup();
@@ -33,7 +34,7 @@ function checkRecipients(eventArgs) {
                 eventArgs.completed({ allowEvent: true });
             }
         } else {
-            console.error("Failed to retrieve recipients:", asyncResult.error);
+            console.error("Failed to retrieve recipients.");
             eventArgs.completed({ allowEvent: true });
         }
     });
