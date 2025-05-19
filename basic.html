@@ -1,36 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>External Email Warning</title>
-  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-  <script>
-    Office.onReady(function(info) {
-      if (info.host === Office.HostType.Outlook) {
-        document.getElementById("sendButton").onclick = function() {
-          checkRecipients();
-        };
-      }
-    });
-
-    function checkRecipients() {
-      var item = Office.context.mailbox.item;
-      var recipients = item.to;
-      var externalRecipients = recipients.filter(function(recipient) {
-        return !recipient.emailAddress.endsWith("@4h72mt.onmicrosoft.com");
-      });
-
-      if (externalRecipients.length > 0) {
-        var confirmation = confirm("You are sending this email to an external recipient. Do you want to proceed?");
-        if (confirmation) {
-          item.send();
-        }
-      } else {
-        item.send();
-      }
-    }
-  </script>
+    <title>External Email Checker</title>
+    <link rel="stylesheet" type="text/css" href="taskpane.css">
 </head>
 <body>
-  <button id="sendButton">Send Email</button>
+    <div id="warningPopup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h2>Warning</h2>
+            <p>You are sending this email to an external address. Do you wish to continue?</p>
+            <button id="continueBtn">Continue</button>
+            <button id="cancelBtn">Cancel</button>
+        </div>
+    </div>
+    <script src="taskpane.js"></script>
 </body>
 </html>
