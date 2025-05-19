@@ -1,26 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>External Email Checker</title>
-    <link rel="stylesheet" type="text/css" href="basic.css">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>External Email Warning</title>
+    <link rel="stylesheet" href="basic.css" />
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    <script>
-        Office.onReady(function (info) {
-            if (info.host === Office.HostType.Outlook) {
-                console.log("Office is ready in Outlook.");
-            }
-        });
-    </script>
+    <script src="basic.js" defer></script>
 </head>
 <body>
-    <div id="warningPopup" class="popup" style="display: none;">
-        <div class="popup-content">
-            <h2>Warning</h2>
-            <p>You are sending this email to an external address. Do you wish to continue?</p>
-            <button id="continueBtn">Continue</button>
-            <button id="cancelBtn">Cancel</button>
-        </div>
-    </div>
-    <script src="basic.js"></script>
+    <h2>External Email Warning Add-in</h2>
+    <div id="message">No external recipients detected.</div>
 </body>
 </html>
