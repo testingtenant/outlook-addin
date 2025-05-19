@@ -29,7 +29,12 @@
         </Form>
     </FormSettings>
 
-    <Permissions>ReadWriteMailbox</Permissions>
+    <Permissions>ReadWriteItem</Permissions>
+
+    <Rule xsi:type="RuleCollection" Mode="Or">
+        <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit"/>
+        <Rule xsi:type="ItemIs" ItemType="Appointment" FormType="Edit"/>
+    </Rule>
 
     <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
         <Requirements>
@@ -40,7 +45,7 @@
         <Hosts>
             <Host xsi:type="MailHost">
                 <DesktopFormFactor>
-                    <ExtensionPoint xsi:type="MessageReadCommandSurface">
+                    <ExtensionPoint xsi:type="MessageComposeCommandSurface">
                         <OfficeTab id="TabDefault">
                             <Group id="msgComposeCmdGroup">
                                 <Label resid="CommandsGroup.Label"/>
