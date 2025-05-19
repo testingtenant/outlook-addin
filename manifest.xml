@@ -29,5 +29,5 @@
         </Form>
     </FormSettings>
 
-    <Permissions>ReadItem</Permissions>
+    <Permissions>ReadWriteMailbox</Permissions>
 </OfficeApp>
