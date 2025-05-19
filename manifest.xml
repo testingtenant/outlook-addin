@@ -24,7 +24,7 @@
     <FormSettings>
         <Form xsi:type="ItemSend">
             <DesktopSettings>
-                <SourceLocation DefaultValue="https://testingtenant.github.io/outlook-addin/taskpane.html" />
+                <SourceLocation DefaultValue="https://testingtenant.github.io/outlook-addin/basic.html" />
             </DesktopSettings>
         </Form>
     </FormSettings>
