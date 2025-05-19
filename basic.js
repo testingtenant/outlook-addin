@@ -1,53 +1,32 @@
-Office.onReady((info) => {
-    // Check if the add-in is running in Outlook
-    if (info.host !== Office.HostType.Outlook) {
-        console.error("This add-in only works in Outlook.");
+Office.onReady(() => {
+    if (!Office.context.mailbox) {
+        console.warn("This add-in only works in Outlook.");
+        document.getElementById("message").innerText = "This add-in only works in Outlook.";
         return;
     }
 
-    console.log("Office is ready in Outlook.");
-    
-    // Register the event handler for ItemSend
-    Office.context.mailbox.item.addHandlerAsync(Office.EventType.ItemSend, checkRecipients);
-});
+    // Only run if this is an email message read form
+    if (Office.context.mailbox.item && Office.context.mailbox.item.to) {
+        Office.context.mailbox.item.to.getAsync((asyncResult) => {
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+                const recipients = asyncResult.value;
+                const externalRecipients = recipients.filter(recipient => {
+                    return !recipient.emailAddress.endsWith("@4h72mt.onmicrosoft.com") && !recipient.emailAddress.endsWith("@bizwind.co.jp");
+                });
 
-function checkRecipients(eventArgs) {
-    const organizationDomain = "4h72mt.onmicrosoft.com";  
-    let warn = false;
-
-    Office.context.mailbox.item.to.getAsync((asyncResult) => {
-        if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            const recipients = asyncResult.value;
-            recipients.forEach((email) => {
-                if (email.emailAddress.indexOf("@") > 0) {
-                    let domain = email.emailAddress.split('@')[1].toLowerCase();
-                    if (domain !== organizationDomain) {
-                        warn = true;
-                    }
+                if (externalRecipients.length > 0) {
+                    const warningMessage = "Warning: You are sending an email to an external recipient.";
+                    document.getElementById("message").innerText = warningMessage;
+                    console.warn(warningMessage);
+                } else {
+                    document.getElementById("message").innerText = "No external recipients detected.";
                 }
-            });
-
-            if (warn) {
-                showPopup();
-                eventArgs.completed({ allowEvent: false });
             } else {
-                eventArgs.completed({ allowEvent: true });
+                console.error("Failed to get recipient information.", asyncResult.error.message);
+                document.getElementById("message").innerText = "Failed to retrieve recipient information.";
             }
-        } else {
-            console.error("Failed to retrieve recipients.");
-            eventArgs.completed({ allowEvent: true });
-        }
-    });
-}
-
-function showPopup() {
-    const popup = document.getElementById("warningPopup");
-    popup.style.display = "flex";
-    document.getElementById("continueBtn").onclick = () => {
-        popup.style.display = "none";
-    };
-    document.getElementById("cancelBtn").onclick = () => {
-        popup.style.display = "none";
-        Office.context.mailbox.item.cancelSendAsync();
-    };
-}
+        });
+    } else {
+        document.getElementById("message").innerText = "Cannot get recipient information for this item.";
+    }
+});
