@@ -4,6 +4,13 @@
     <title>External Email Checker</title>
     <link rel="stylesheet" type="text/css" href="basic.css">
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script>
+        Office.onReady(function (info) {
+            if (info.host === Office.HostType.Outlook) {
+                console.log("Office is ready in Outlook.");
+            }
+        });
+    </script>
 </head>
 <body>
     <div id="warningPopup" class="popup" style="display: none;">
