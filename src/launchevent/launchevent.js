@@ -1,5 +1,5 @@
 // Define the customer domain
-const customerDomain = "@bizwind.co.jp";
+const customerDomain = "@4h72mt.onmicrosoft.com";
 
 // Handler for the OnMessageSend event
 async function onMessageSendHandler(event) {
