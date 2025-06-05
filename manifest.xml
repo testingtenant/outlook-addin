@@ -2,12 +2,12 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>ce6fedcb-16f5-4688-9cf5-8dfcf6ecf336</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Bizwind</ProviderName>
+  <ProviderName>TestTenant</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Email Checker"/>
   <Description DefaultValue="Helps prevent accidental data leaks by alerting users when emailing outside the company"/>
-  <IconUrl DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/assets/icon-64_logo.png"/>
-  <HighResolutionIconUrl DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/assets/icon-128_logo.png"/>
+  <IconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-64_logo.png"/>
+  <HighResolutionIconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-128_logo.png"/>
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
   <AppDomains>
     <AppDomain>https://www.contoso.com</AppDomain>
@@ -23,7 +23,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/src/taskpane/taskpane.html"/>
+        <SourceLocation DefaultValue="https://testingtenant.github.io/outlook-addin/src/taskpane/taskpane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -106,16 +106,16 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/src/commands/commands.html" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/src/taskpane/taskpane.html" />
-        <bt:Url id="WebViewRuntime.Url" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/src/commands/commands.html" />
+        <bt:Url id="Commands.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/commands/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/taskpane/taskpane.html" />
+        <bt:Url id="WebViewRuntime.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/commands/commands.html" />
         <!-- Entry needed for Outlook on Windows. -->
-        <bt:Url id="JSRuntime.Url" DefaultValue="https://ph-dev-test.github.io/outlook-external-checker/src/launchevent/launchevent.js" />
+        <bt:Url id="JSRuntime.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/launchevent/launchevent.js" />
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
