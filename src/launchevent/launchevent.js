@@ -1,13 +1,15 @@
-// Define the customer domain
-const customerDomain = "@4h72mt.onmicrosoft.com";
-
 // Handler for the OnMessageSend event
 async function onMessageSendHandler(event) {
   try {
+    // Dynamically determine the customer domain from the user's email address
+    const userEmail = Office.context.mailbox.userProfile.emailAddress;
+    const customerDomain = userEmail.substring(userEmail.indexOf('@')).toLowerCase();
+    console.log(`Dynamically set customerDomain to: ${customerDomain}`);
+
     let externalRecipients = [];
 
     // Function to check a single email address
-    function checkEmail(email, field) {
+    function checkEmail,email, field) {
       let cleanedEmail = email;
       const match = cleanedEmail.match(/<(.+?)>|[^<>\s]+/);
       cleanedEmail = match ? match[1] || match[0] : cleanedEmail;
