@@ -1,25 +1,26 @@
 // Handler for the OnMessageSend event
 async function onMessageSendHandler(event) {
   try {
-    // Dynamically determine the customer domain from the user's email address
-    const userEmail = Office.context.mailbox.userProfile.emailAddress;
-    const customerDomain = userEmail.substring(userEmail.indexOf('@')).toLowerCase();
-    console.log(`Dynamically set customerDomain to: ${customerDomain}`);
-
     let externalRecipients = [];
 
+    // Get the user's email address to determine the customer domain
+    const userEmail = Office.context.mailbox.userProfile.emailAddress;
+    const customerDomain = userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase();
+
+    console.log(`User email: ${userEmail}`);
+    console.log(`Customer domain: ${customerDomain}`);
+
     // Function to check a single email address
-    function checkEmail,email, field) {
+    function checkEmail(email, field) {
       let cleanedEmail = email;
       const match = cleanedEmail.match(/<(.+?)>|[^<>\s]+/);
       cleanedEmail = match ? match[1] || match[0] : cleanedEmail;
       cleanedEmail = cleanedEmail.trim().toLowerCase();
-      const domain = customerDomain.toLowerCase();
 
       console.log(`Checking ${field} email: ${cleanedEmail}`);
-      console.log(`Ends with ${domain}? ${cleanedEmail.endsWith(domain)}`);
+      console.log(`Ends with ${customerDomain}? ${cleanedEmail.endsWith(customerDomain)}`);
 
-      if (!cleanedEmail.endsWith(domain)) {
+      if (!cleanedEmail.endsWith(customerDomain)) {
         externalRecipients.push(`${field}: ${cleanedEmail}`);
       }
     }
