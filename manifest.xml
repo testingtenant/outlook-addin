@@ -4,7 +4,7 @@
 <Version>1.0.0.0</Version>
 <ProviderName>TestTenant</ProviderName>
 <DefaultLocale>en-US</DefaultLocale>
-<DisplayName DefaultValue="External Email Warningr"/>
+<DisplayName DefaultValue="External Email Warning"/>
 <Description DefaultValue="Helps prevent accidental data leaks by alerting users when emailing outside the company"/>
 <IconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-64_logo.png"/>
 <HighResolutionIconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-128_logo.png"/>
