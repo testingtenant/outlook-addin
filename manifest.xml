@@ -4,20 +4,21 @@
   <Version>1.0.0.0</Version>
   <ProviderName>TestTenant</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Email Checker"/>
+  <DisplayName DefaultValue="External Email Warning"/>
   <Description DefaultValue="Helps prevent accidental data leaks by alerting users when emailing outside the company"/>
   <IconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-64_logo.png"/>
   <HighResolutionIconUrl DefaultValue="https://testingtenant.github.io/outlook-addin/assets/icon-128_logo.png"/>
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
   <AppDomains>
     <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://testingtenant.github.io</AppDomain> <!-- Added for resource hosting -->
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
   </Hosts>
   <Requirements>
     <Sets>
-      <Set Name="Mailbox" MinVersion="1.1"/>
+      <Set Name="Mailbox" MinVersion="1.8"/> <!-- Updated to 1.8 for userProfile.emailAddress -->
     </Sets>
   </Requirements>
   <FormSettings>
@@ -33,7 +34,6 @@
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
   <DisableEntityHighlighting>false</DisableEntityHighlighting>
-  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
     <Requirements>
       <bt:Sets DefaultMinVersion="1.12">
@@ -42,12 +42,8 @@
     </Requirements>
     <Hosts>
       <Host xsi:type="MailHost">
-        <!-- Event-based activation happens in a lightweight runtime.-->
         <Runtimes>
-          <!-- HTML file including reference to or inline JavaScript event handlers.
-               This is used by Outlook on the web and on the new Mac UI. -->
           <Runtime resid="WebViewRuntime.Url">
-            <!-- JavaScript file containing event handlers. This is used by Outlook on Windows. -->
             <Override type="javascript" resid="JSRuntime.Url"/>
           </Runtime>
         </Runtimes>
@@ -90,15 +86,10 @@
               </Group>
             </OfficeTab>
           </ExtensionPoint>
-
-          <!-- Can configure other command surface extension points for add-in command support. -->
-
-          <!-- Enable launching the add-in on the included event. -->
           <ExtensionPoint xsi:type="LaunchEvent">
             <LaunchEvents>
               <LaunchEvent Type="OnMessageSend" FunctionName="onMessageSendHandler" SendMode="PromptUser" />
             </LaunchEvents>
-            <!-- Identifies the runtime to be used (also referenced by the Runtime element). -->
             <SourceLocation resid="WebViewRuntime.Url"/>
           </ExtensionPoint>
         </DesktopFormFactor>
@@ -114,7 +105,6 @@
         <bt:Url id="Commands.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/commands/commands.html" />
         <bt:Url id="Taskpane.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/taskpane/taskpane.html" />
         <bt:Url id="WebViewRuntime.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/commands/commands.html" />
-        <!-- Entry needed for Outlook on Windows. -->
         <bt:Url id="JSRuntime.Url" DefaultValue="https://testingtenant.github.io/outlook-addin/src/launchevent/launchevent.js" />
       </bt:Urls>
       <bt:ShortStrings>
@@ -128,5 +118,4 @@
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
-</VersionOverrides>
 </OfficeApp>
