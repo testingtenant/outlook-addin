@@ -3,24 +3,35 @@ async function onMessageSendHandler(event) {
   try {
     let externalRecipients = [];
 
-    // Get the user's email address to determine the customer domain
-    const userEmail = Office.context.mailbox.userProfile.emailAddress;
-    const customerDomain = userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase();
-
-    console.log(`User email: ${userEmail}`);
-    console.log(`Customer domain: ${customerDomain}`);
+    // Load internal domains from roamingSettings or fallback to user's email domain
+    let internalDomains = Office.context.roamingSettings.get("internalDomains") || [];
+    if (internalDomains.length === 0) {
+      const userEmail = Office.context.mailbox.userProfile.emailAddress;
+      if (!userEmail.includes('@')) {
+        console.log('Invalid user email format, allowing send.');
+        event.completed({ allowEvent: true });
+        return;
+      }
+      internalDomains = [userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase()];
+    }
+    console.log(`Internal domains: ${internalDomains.join(', ')}`);
 
     // Function to check a single email address
     function checkEmail(email, field) {
-      let cleanedEmail = email;
+      if (!email) return;
+      let cleanedEmail = email.trim().toLowerCase();
       const match = cleanedEmail.match(/<(.+?)>|[^<>\s]+/);
-      cleanedEmail = match ? match[1] || match[0] : cleanedEmail;
-      cleanedEmail = cleanedEmail.trim().toLowerCase();
-
-      console.log(`Checking ${field} email: ${cleanedEmail}`);
-      console.log(`Ends with ${customerDomain}? ${cleanedEmail.endsWith(customerDomain)}`);
-
-      if (!cleanedEmail.endsWith(customerDomain)) {
+      if (!match) {
+        console.log(`Invalid email format in ${field}: ${email}`);
+        return;
+      }
+      cleanedEmail = match[1] || match[0];
+      if (!cleanedEmail.includes('@')) {
+        console.log(`Skipping invalid email in ${field}: ${cleanedEmail}`);
+        return;
+      }
+      const isExternal = !internalDomains.some(domain => cleanedEmail.endsWith(domain));
+      if (isExternal) {
         externalRecipients.push(`${field}: ${cleanedEmail}`);
       }
     }
@@ -36,21 +47,21 @@ async function onMessageSendHandler(event) {
     if (toResult.status === Office.AsyncResultStatus.Succeeded) {
       toResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "To"));
     } else {
-      console.log("Failed to get To recipients.");
+      console.log(`Failed to get To recipients: ${toResult.error.message}`);
     }
 
     // Process CC recipients
     if (ccResult.status === Office.AsyncResultStatus.Succeeded) {
       ccResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "CC"));
     } else {
-      console.log("Failed to get CC recipients.");
+      console.log(`Failed to get CC recipients: ${ccResult.error.message}`);
     }
 
     // Process BCC recipients
     if (bccResult.status === Office.AsyncResultStatus.Succeeded) {
       bccResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "BCC"));
     } else {
-      console.log("Failed to get BCC recipients.");
+      console.log(`Failed to get BCC recipients: ${bccResult.error.message}`);
     }
 
     // Decide whether to show popup
@@ -68,8 +79,8 @@ async function onMessageSendHandler(event) {
       event.completed({ allowEvent: true });
     }
   } catch (error) {
-    console.log("Error in onMessageSendHandler: " + error);
-    event.completed({ allowEvent: true }); // Fallback to allow send on error
+    console.log(`Error in onMessageSendHandler: ${error.message}`);
+    event.completed({ allowEvent: true }); // Fallback to allow send
   }
 }
 
@@ -79,5 +90,5 @@ Office.onReady((info) => {
     Office.actions.associate("onMessageSendHandler", onMessageSendHandler);
   }
 }).catch((error) => {
-  console.log("Error initializing Office API: " + error);
+  console.log(`Error initializing Office API: ${error.message}`);
 });
