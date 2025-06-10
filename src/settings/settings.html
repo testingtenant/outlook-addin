@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Domain Settings</title>
+  <meta charset="utf-8" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0078d4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+    .message {
+      margin-top: 10px;
+      color: green;
+      display: none;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Domain Settings</h2>
+    <p>Enter internal domains (e.g., @example.com, @company.com). Separate multiple domains with commas.</p>
+    <label for="domains">Internal Domains:</label>
+    <input type="text" id="domains" placeholder="@example.com, @company.com" />
+    <button onclick="saveDomains()">Save</button>
+    <button onclick="clearDomains()">Clear Domains</button>
+    <div id="message" class="message"></div>
+  </div>
+
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script>
+    Office.onReady(() => {
+      loadDomains();
+    });
+
+    function loadDomains() {
+      const domains = Office.context.roamingSettings.get("internalDomains") || [];
+      document.getElementById("domains").value = domains.join(", ");
+    }
+
+    function saveDomains() {
+      const domainsInput = document.getElementById("domains").value;
+      const messageDiv = document.getElementById("message");
+
+      const domains = domainsInput
+        .split(",")
+        .map((d) => d.trim().toLowerCase())
+        .filter((d) => d.startsWith("@") && d.length > 1);
+
+      if (domains.length === 0) {
+        messageDiv.textContent = "Please enter at least one valid domain starting with '@'.";
+        messageDiv.className = "message error";
+        messageDiv.style.display = "block";
+        return;
+      }
+
+      Office.context.roamingSettings.set("internalDomains", domains);
+      Office.context.roamingSettings.saveAsync((result) => {
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          messageDiv.textContent = "Domains saved successfully!";
+          messageDiv.className = "message";
+          messageDiv.style.display = "block";
+        } else {
+          messageDiv.textContent = "Error saving domains: " + result.error.message;
+          messageDiv.className = "message error";
+          messageDiv.style.display = "block";
+        }
+      });
+    }
+
+    function clearDomains() {
+      Office.context.roamingSettings.remove("internalDomains");
+      Office.context.roamingSettings.saveAsync((result) => {
+        const messageDiv = document.getElementById("message");
+        if (result.status === Office.AsyncResultStatus.Succeeded) {
+          document.getElementById("domains").value = "";
+          messageDiv.textContent = "Domains cleared successfully!";
+          messageDiv.className = "message";
+          messageDiv.style.display = "block";
+        } else {
+          messageDiv.textContent = "Error clearing domains: " + result.error.message;
+          messageDiv.className = "message error";
+          messageDiv.style.display = "block";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
