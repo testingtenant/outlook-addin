@@ -2,7 +2,7 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>ce6fedcb-16f5-4688-9cf5-8dfcf6ecf336</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>TestTenant</ProviderName>
+  <ProviderName>TestingTenant</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="External Email Warning"/>
   <Description DefaultValue="Helps prevent accidental data leaks by alerting users when emailing outside the company"/>
