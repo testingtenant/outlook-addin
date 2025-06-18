@@ -32,7 +32,8 @@ async function onMessageSendHandler(event) {
       }
       const isExternal = !internalDomains.some(domain => cleanedEmail.endsWith(domain));
       if (isExternal) {
-        externalRecipients.push(`${field}: ${cleanedEmail}`);
+        // Emphasize external email with formatting (e.g., uppercase and symbols)
+        externalRecipients.push(`${field}: ***${cleanedEmail.toUpperCase()}***`);
       }
     }
 
@@ -70,9 +71,9 @@ async function onMessageSendHandler(event) {
       event.completed({
         allowEvent: false,
         errorMessage:
-          "You are sending this email to external recipients:\n\n" +
+          "You are sending this email to external recipients (highlighted for attention):\n\n" +
           externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it?",
+          "\n\nAre you sure you want to send it? Select 'Send Anyway' to proceed or 'Cancel' to stop.",
       });
     } else {
       console.log("No external recipients found, allowing send.");
