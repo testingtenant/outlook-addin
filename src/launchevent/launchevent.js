@@ -67,12 +67,35 @@ async function onMessageSendHandler(event) {
     // Decide whether to show popup
     if (externalRecipients.length > 0) {
       console.log(`External recipients found: ${externalRecipients.join(", ")}`);
-      event.completed({
-        allowEvent: false,
-        errorMessage:
-          "You are sending this email to external recipients:\n\n" +
-          externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it?",
+      // Use custom dialog instead of errorMessage
+      const dialogUrl = "https://testingtenant.github.io/outlook-addin/src/dialog/dialog.html";
+      Office.context.ui.displayDialogAsync(dialogUrl, { height: 40, width: 30 }, (asyncResult) => {
+        if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+          console.log(`Failed to open dialog: ${asyncResult.error.message}`);
+          event.completed({ allowEvent: true }); // Fallback to allow send
+          return;
+        }
+        const dialog = asyncResult.value;
+        dialog.args = { recipients: externalRecipients }; // Pass recipients to dialog
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+          dialog.close();
+          if (arg.message && typeof arg.message === "string") {
+            try {
+              const message = JSON.parse(arg.message);
+              if (message.action === "send") {
+                event.completed({ allowEvent: true });
+              } else {
+                event.completed({ allowEvent: false });
+              }
+            } catch (e) {
+              console.log(`Error parsing dialog message: ${e.message}`);
+              event.completed({ allowEvent: false });
+            }
+          } else {
+            console.log("Invalid dialog message received");
+            event.completed({ allowEvent: false });
+          }
+        });
       });
     } else {
       console.log("No external recipients found, allowing send.");
