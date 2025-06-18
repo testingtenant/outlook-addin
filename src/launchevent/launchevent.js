@@ -1,95 +1,34 @@
-// Handler for the OnMessageSend event
-async function onMessageSendHandler(event) {
-  try {
-    let externalRecipients = [];
+// Initialize millisecond counter and start timer
+Set(varMillisecondCounter, 0);
+Set(varAutoStart, true);
 
-    // Load internal domains from roamingSettings or fallback to user's email domain
-    let internalDomains = Office.context.roamingSettings.get("internalDomains") || [];
-    if (internalDomains.length === 0) {
-      const userEmail = Office.context.mailbox.userProfile.emailAddress;
-      if (!userEmail.includes('@')) {
-        console.log('Invalid user email format, allowing send.');
-        event.completed({ allowEvent: true });
-        return;
-      }
-      internalDomains = [userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase()];
-    }
-    console.log(`Internal domains: ${internalDomains.join(', ')}`);
+// Capture the start time
+Set(varStartTime, Now());
+Set(varStartMillis, varMillisecondCounter);
 
-    // Function to check a single email address
-    function checkEmail(email, field) {
-      if (!email) return;
-      let cleanedEmail = email.trim().toLowerCase();
-      const match = cleanedEmail.match(/<(.+?)>|[^<>\s]+/);
-      if (!match) {
-        console.log(`Invalid email format in ${field}: ${email}`);
-        return;
-      }
-      cleanedEmail = match[1] || match[0];
-      if (!cleanedEmail.includes('@')) {
-        console.log(`Skipping invalid email in ${field}: ${cleanedEmail}`);
-        return;
-      }
-      const isExternal = !internalDomains.some(domain => cleanedEmail.endsWith(domain));
-      if (isExternal) {
-        // Emphasize external email with formatting (e.g., uppercase and symbols)
-        externalRecipients.push(`${field}: ***${cleanedEmail.toUpperCase()}***`);
-      }
-    }
+// Collect selected parts into a collection and convert to JSON
+Clear(colSelectedParts); // Clear the collection to ensure it starts empty
+ForAll(
+    Filter(parts, product_id = DropdownCanvas1.Selected.id), // Filter parts based on selected product ID
+    Collect(colSelectedParts, {part_id: ThisRecord.id, name: ThisRecord.name, transaction_date: Today()}) // Collect part ID, name, and today's date
+);
+// Convert the collection to JSON format
+Set(varPartIDJSON, JSON(colSelectedParts, JSONFormat.IncludeBinaryData));
 
-    // Parallelize the retrieval of To, CC, and BCC recipients
-    const [toResult, ccResult, bccResult] = await Promise.all([
-      new Promise((resolve) => Office.context.mailbox.item.to.getAsync(resolve)),
-      new Promise((resolve) => Office.context.mailbox.item.cc.getAsync(resolve)),
-      new Promise((resolve) => Office.context.mailbox.item.bcc.getAsync(resolve)),
-    ]);
+// Call the stored procedure and capture the end time
+With(
+    {result: ms_dev_1.dboInsertSalesFromJson({json: varPartIDJSON})},
+    // Capture the end time and milliseconds
+    Set(varEndTime, Now());
+    Set(varEndMillis, varMillisecondCounter);
+    // Stop the timer
+    Set(varAutoStart, false)
+);
 
-    // Process To recipients
-    if (toResult.status === Office.AsyncResultStatus.Succeeded) {
-      toResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "To"));
-    } else {
-      console.log(`Failed to get To recipients: ${toResult.error.message}`);
-    }
+// Format times to show only time with milliseconds
+Set(varStartTimeFormatted, Text(varStartTime, "hh:mm:ss") & "." & Text(Mod(varStartMillis, 1000), "000"));
+Set(varEndTimeFormatted, Text(varEndTime, "hh:mm:ss") & "." & Text(Mod(varEndMillis, 1000), "000"));
 
-    // Process CC recipients
-    if (ccResult.status === Office.AsyncResultStatus.Succeeded) {
-      ccResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "CC"));
-    } else {
-      console.log(`Failed to get CC recipients: ${ccResult.error.message}`);
-    }
-
-    // Process BCC recipients
-    if (bccResult.status === Office.AsyncResultStatus.Succeeded) {
-      bccResult.value.forEach((recipient) => checkEmail(recipient.emailAddress, "BCC"));
-    } else {
-      console.log(`Failed to get BCC recipients: ${bccResult.error.message}`);
-    }
-
-    // Decide whether to show popup
-    if (externalRecipients.length > 0) {
-      console.log(`External recipients found: ${externalRecipients.join(", ")}`);
-      event.completed({
-        allowEvent: false,
-        errorMessage:
-          "You are sending this email to external recipients (highlighted for attention):\n\n" +
-          externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it? Select 'Send Anyway' to proceed or 'Cancel' to stop.",
-      });
-    } else {
-      console.log("No external recipients found, allowing send.");
-      event.completed({ allowEvent: true });
-    }
-  } catch (error) {
-    console.log(`Error in onMessageSendHandler: ${error.message}`);
-    event.completed({ allowEvent: true }); // Fallback to allow send
-  }
-}
-
-// Ensure Office API is ready before associating the event handler
-Office.onReady((info) => {
-  if (info.platform === Office.PlatformType.PC || info.platform == null) {
-    Office.actions.associate("onMessageSendHandler", onMessageSendHandler);
-  }
-}).catch((error) => {
-  console.log(`Error initializing Office API: ${error.message}`);
-});
+Set(varDurationSeconds, DateDiff(varStartTime, varEndTime, TimeUnit.Seconds));
+Set(varDurationMillis, varEndMillis - varStartMillis);
+Set(varDurationFormatted, varDurationSeconds & "." & Text(Mod(varDurationMillis, 1000), "000") & " seconds");
