@@ -70,7 +70,7 @@ async function onMessageSendHandler(event) {
 
       // Open a custom dialog
       Office.context.ui.displayDialogAsync(
-        "https://localhost:3000/dialog.html", // Update with your dialog HTML file URL
+        "https://testingtenant.github.io/outlook-addin/src/dialog/dialog.html",
         { height: 30, width: 20, displayInIframe: true },
         (asyncResult) => {
           if (asyncResult.status === Office.AsyncResultStatus.Failed) {
