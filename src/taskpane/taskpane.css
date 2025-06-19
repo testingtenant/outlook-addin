@@ -9,6 +9,7 @@
      height: 100%;
      margin: 0;
      padding: 0;
+     color: red;
  }
  
  ul {
@@ -44,6 +45,7 @@
  .ms-welcome__main > h2 {
      width: 100%;
      text-align: center;
+     color: red;
  }
  
  .ms-welcome__features {
