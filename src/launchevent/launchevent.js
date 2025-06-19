@@ -2,6 +2,7 @@
 async function onMessageSendHandler(event) {
   try {
     let externalRecipients = [];
+    let externalDomains = new Set(); // Use Set to store unique domains
 
     // Load internal domains from roamingSettings or fallback to user's email domain
     let internalDomains = Office.context.roamingSettings.get("internalDomains") || [];
@@ -33,6 +34,9 @@ async function onMessageSendHandler(event) {
       const isExternal = !internalDomains.some(domain => cleanedEmail.endsWith(domain));
       if (isExternal) {
         externalRecipients.push(`${field}: ${cleanedEmail}`);
+        // Extract domain from cleanedEmail
+        const domain = `@${cleanedEmail.split('@')[1]}`;
+        externalDomains.add(domain);
       }
     }
 
@@ -67,12 +71,18 @@ async function onMessageSendHandler(event) {
     // Decide whether to show popup
     if (externalRecipients.length > 0) {
       console.log(`External recipients found: ${externalRecipients.join(", ")}`);
+      console.log(`External domains found: ${Array.from(externalDomains).join(", ")}`);
+      // Format the message with domains and emails
+      const message = 
+        "You are sending this email to external recipients:\n\n" +
+        "Domain list\n" +
+        Array.from(externalDomains).join("\n") +
+        "\n\nEmail list\n" +
+        externalRecipients.join("\n") +
+        "\n\nAre you sure you want to send it?";
       event.completed({
         allowEvent: false,
-        errorMessage:
-          "You are sending this email to external recipients:\n\n" +
-          externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it?",
+        errorMessage: message,
       });
     } else {
       console.log("No external recipients found, allowing send.");
@@ -86,7 +96,7 @@ async function onMessageSendHandler(event) {
 
 // Ensure Office API is ready before associating the event handler
 Office.onReady((info) => {
-  if (info.platform === Office.PlatformType.PC || info.platform == null) {
+  if (info.platform === Office.PlatformType.PC || info.platform === null) {
     Office.actions.associate("onMessageSendHandler", onMessageSendHandler);
   }
 }).catch((error) => {
