@@ -64,15 +64,22 @@ async function onMessageSendHandler(event) {
       console.log(`Failed to get BCC recipients: ${bccResult.error.message}`);
     }
 
-    // Decide whether to show popup
+    // Decide whether to show styled notification
     if (externalRecipients.length > 0) {
       console.log(`External recipients found: ${externalRecipients.join(", ")}`);
-      event.completed({
-        allowEvent: false,
-        errorMessage:
-          "You are sending this email to external recipients:\n\n" +
-          externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it?",
+
+      const htmlList = externalRecipients.map(item => `<span style="color:red;">${item}</span>`).join("<br>");
+
+      Office.context.mailbox.item.notificationMessages.addAsync("externalWarning", {
+        type: Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage,
+        message: `<b>External Recipients Detected:</b><br>${htmlList}`,
+        icon: "Icon.80x80",
+        persistent: true
+      }, () => {
+        event.completed({
+          allowEvent: false,
+          errorMessage: "You're sending this email to external recipients. Please check the red-highlighted recipients above."
+        });
       });
     } else {
       console.log("No external recipients found, allowing send.");
