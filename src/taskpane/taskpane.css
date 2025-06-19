@@ -9,7 +9,7 @@
      height: 100%;
      margin: 0;
      padding: 0;
-     color: red;
+     color: #d70000;
  }
  
  ul {
@@ -45,7 +45,7 @@
  .ms-welcome__main > h2 {
      width: 100%;
      text-align: center;
-     color: red;
+     color: #d70000;
  }
  
  .ms-welcome__features {
@@ -68,7 +68,7 @@
  }
  
 .ms-Button.ms-Button--hero .ms-Button-label {
-  color: #0078d7;
+  color: #d70000;
 }
 
 .ms-Button.ms-Button--hero:hover .ms-Button-label,
