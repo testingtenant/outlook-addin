@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>External Email Warning</title>
+  <meta charset="utf-8" />
+  <link href="dialog.css" rel="stylesheet" type="text/css" />
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="dialog.js"></script>
+</head>
+<body>
+  <div class="dialog-container">
+    <h2>External Email Warning</h2>
+    <p>You are sending this email to external recipients:</p>
+    <ul id="recipient-list" class="recipient-list"></ul>
+    <p>Are you sure you want to send it?</p>
+    <div class="dialog-buttons">
+      <button id="sendButton" class="ms-Button ms-Button--primary">Send Anyway</button>
+      <button id="cancelButton" class="ms-Button">Don't Send</button>
+    </div>
+  </div>
+</body>
+</html>
