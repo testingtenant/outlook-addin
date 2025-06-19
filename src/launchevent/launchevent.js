@@ -67,13 +67,34 @@ async function onMessageSendHandler(event) {
     // Decide whether to show popup
     if (externalRecipients.length > 0) {
       console.log(`External recipients found: ${externalRecipients.join(", ")}`);
-      event.completed({
-        allowEvent: false,
-        errorMessage:
-          "You are sending this email to external recipients:\n\n" +
-          externalRecipients.join("\n") +
-          "\n\nAre you sure you want to send it?",
-      });
+
+      // Open a custom dialog
+      Office.context.ui.displayDialogAsync(
+        "https://localhost:3000/dialog.html", // Update with your dialog HTML file URL
+        { height: 30, width: 20, displayInIframe: true },
+        (asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+            console.log(`Failed to open dialog: ${asyncResult.error.message}`);
+            event.completed({ allowEvent: true }); // Fallback to allow send
+            return;
+          }
+
+          const dialog = asyncResult.value;
+          dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg) => {
+            dialog.close();
+            if (arg.message === "send") {
+              console.log("User chose to send the email.");
+              event.completed({ allowEvent: true });
+            } else {
+              console.log("User chose to cancel the send.");
+              event.completed({ allowEvent: false });
+            }
+          });
+
+          // Pass the external recipients to the dialog
+          dialog.messageChild(JSON.stringify({ externalRecipients }));
+        }
+      );
     } else {
       console.log("No external recipients found, allowing send.");
       event.completed({ allowEvent: true });
