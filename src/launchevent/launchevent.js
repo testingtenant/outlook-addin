@@ -99,7 +99,7 @@ async function onMessageSendHandler(event) {
           console.log(`External domains found: ${Array.from(externalDomains).join(", ")}`);
           const message =
             "You are sending this email to external recipients:\n\n" +
-            "<b>Domain list</b>\n" +
+            "***Domain list***\n" +
             Array.from(externalDomains).join("\n") +
             "\n\nEmail list\n" +
             externalRecipients.join("\n") +
