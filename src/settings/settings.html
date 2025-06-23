@@ -59,12 +59,12 @@
     });
 
     function loadDomains() {
-      const domains = Office.context.roamingSettings.get("internalDomains") || [];
       const domainsInput = document.getElementById("domains");
+      let internalDomains = Office.context.roamingSettings.get("internalDomains") || [];
 
-      if (domains.length > 0) {
+      if (internalDomains.length > 0) {
         // Display saved domains if they exist
-        domainsInput.value = domains.join(", ");
+        domainsInput.value = internalDomains.join(", ");
       } else {
         // Fetch and display the user's email domain as default
         try {
@@ -72,14 +72,17 @@
           if (userEmail && userEmail.includes('@')) {
             const defaultDomain = userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase();
             domainsInput.value = defaultDomain;
+            domainsInput.placeholder = `e.g., ${defaultDomain}`;
           } else {
             domainsInput.value = "";
-            showMessage("Unable to retrieve user email domain.", true);
+            domainsInput.placeholder = "@example.com";
+            showMessage("Unable to retrieve user email domain. Please contact support.", true);
           }
         } catch (error) {
-          console.log(`Error fetching user email: ${error.message}`);
+          console.error(`Error fetching user email: ${error.message}`);
           domainsInput.value = "";
-          showMessage("Error retrieving user email domain.", true);
+          domainsInput.placeholder = "@example.com";
+          showMessage("Error retrieving user email domain. Please contact support.", true);
         }
       }
     }
@@ -103,7 +106,7 @@
         if (result.status === Office.AsyncResultStatus.Succeeded) {
           showMessage("Domains saved successfully!");
         } else {
-          showMessage("Error saving domains: " + result.error.message, true);
+          showMessage(`Error saving domains: ${result.error.message}`, true);
         }
       });
     }
@@ -115,7 +118,7 @@
           loadDomains(); // Reload to show default domain
           showMessage("Domains cleared successfully!");
         } else {
-          showMessage("Error clearing domains: " + result.error.message, true);
+          showMessage(`Error clearing domains: ${result.error.message}`, true);
         }
       });
     }
