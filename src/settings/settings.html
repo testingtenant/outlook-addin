@@ -60,7 +60,28 @@
 
     function loadDomains() {
       const domains = Office.context.roamingSettings.get("internalDomains") || [];
-      document.getElementById("domains").value = domains.join(", ");
+      const domainsInput = document.getElementById("domains");
+
+      if (domains.length > 0) {
+        // Display saved domains if they exist
+        domainsInput.value = domains.join(", ");
+      } else {
+        // Fetch and display the user's email domain as default
+        try {
+          const userEmail = Office.context.mailbox.userProfile.emailAddress;
+          if (userEmail && userEmail.includes('@')) {
+            const defaultDomain = userEmail.substring(userEmail.lastIndexOf('@')).toLowerCase();
+            domainsInput.value = defaultDomain;
+          } else {
+            domainsInput.value = "";
+            showMessage("Unable to retrieve user email domain.", true);
+          }
+        } catch (error) {
+          console.log(`Error fetching user email: ${error.message}`);
+          domainsInput.value = "";
+          showMessage("Error retrieving user email domain.", true);
+        }
+      }
     }
 
     function saveDomains() {
@@ -73,22 +94,16 @@
         .filter((d) => d.startsWith("@") && d.length > 1);
 
       if (domains.length === 0) {
-        messageDiv.textContent = "Please enter at least one valid domain starting with '@'.";
-        messageDiv.className = "message error";
-        messageDiv.style.display = "block";
+        showMessage("Please enter at least one valid domain starting with '@'.", true);
         return;
       }
 
       Office.context.roamingSettings.set("internalDomains", domains);
       Office.context.roamingSettings.saveAsync((result) => {
         if (result.status === Office.AsyncResultStatus.Succeeded) {
-          messageDiv.textContent = "Domains saved successfully!";
-          messageDiv.className = "message";
-          messageDiv.style.display = "block";
+          showMessage("Domains saved successfully!");
         } else {
-          messageDiv.textContent = "Error saving domains: " + result.error.message;
-          messageDiv.className = "message error";
-          messageDiv.style.display = "block";
+          showMessage("Error saving domains: " + result.error.message, true);
         }
       });
     }
@@ -96,18 +111,20 @@
     function clearDomains() {
       Office.context.roamingSettings.remove("internalDomains");
       Office.context.roamingSettings.saveAsync((result) => {
-        const messageDiv = document.getElementById("message");
         if (result.status === Office.AsyncResultStatus.Succeeded) {
-          document.getElementById("domains").value = "";
-          messageDiv.textContent = "Domains cleared successfully!";
-          messageDiv.className = "message";
-          messageDiv.style.display = "block";
+          loadDomains(); // Reload to show default domain
+          showMessage("Domains cleared successfully!");
         } else {
-          messageDiv.textContent = "Error clearing domains: " + result.error.message;
-          messageDiv.className = "message error";
-          messageDiv.style.display = "block";
+          showMessage("Error clearing domains: " + result.error.message, true);
         }
       });
+    }
+
+    function showMessage(message, isError = false) {
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = message;
+      messageDiv.className = `message ${isError ? "error" : ""}`;
+      messageDiv.style.display = "block";
     }
   </script>
 </body>
