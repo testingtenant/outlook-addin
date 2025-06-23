@@ -102,10 +102,10 @@ async function onMessageSendHandler(event) {
             "__________________________________________________\n\n" +
             "Domain list\n" +
             Array.from(externalDomains)
-            .map(domain => `→${domain}`) // Add arrow before each domain
-            .join("\n") +
-            "\n__________________________________________________" +
-            "\n\nEmail list\n" +
+              .map(domain => `→${domain}`)
+              .join("\n") +
+            "\n__________________________________________________\n\n" +
+            "Email list\n" +
             externalRecipients.join("\n") +
             "\n\nAre you sure you want to send it?";
           return { allowEvent: false, errorMessage: message };
